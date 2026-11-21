@@ -9,6 +9,18 @@ Honesty rules baked in:
   never exposed to users; the app shows calibrated bands + abstention.
 """
 import json
+import os
+import urllib.request
+
+DATA_URL = "https://raw.githubusercontent.com/hoangsonww/Spot-the-Scam-AI-Job-Fraud/master/data/fake_job_postings.csv"
+DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "fake_job_postings.csv")
+
+if not os.path.exists(DATA_PATH):
+    # EMSCAD via public CC0 mirror (see README for source + license)
+    os.makedirs(os.path.dirname(DATA_PATH), exist_ok=True)
+    print("Downloading EMSCAD (CC0) from public mirror...")
+    urllib.request.urlretrieve(DATA_URL, DATA_PATH)
+
 import numpy as np
 import pandas as pd
 from scipy import sparse
@@ -26,7 +38,7 @@ TEXT_COLS = ["title", "company_profile", "description", "requirements", "benefit
 STRUCT_COLS = ["telecommuting", "has_company_logo", "has_questions"]
 CAT_COLS = ["employment_type", "required_experience", "required_education"]
 
-df = pd.read_csv("/downloads/offercheck/data/fake_job_postings.csv")
+df = pd.read_csv(DATA_PATH)
 df["fraudulent"] = df["fraudulent"].astype(int)
 
 for c in TEXT_COLS:
