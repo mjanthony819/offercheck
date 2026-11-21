@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OfferCheck - Job listing risk screener</title>
+<style>
+  :root {
+    --bg: #131417; --panel: #1b1d21; --panel2: #22252b; --line: #2e323a;
+    --text: #e8eaed; --muted: #9aa0a8; --lime: #c8f542; --lime-dim: #9fbf2f;
+    --amber: #ffb224; --red: #ff5c5c; --red-dim: #b23a3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.55 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 60px; }
+  header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  h1 { font-size: 26px; letter-spacing: -0.5px; }
+  h1 span { color: var(--lime); }
+  .tag { color: var(--muted); font-size: 14px; }
+  .notice { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--amber);
+    padding: 10px 14px; border-radius: 8px; color: var(--muted); font-size: 13.5px; margin: 16px 0 22px; }
+  .notice b { color: var(--amber); font-weight: 600; }
+  textarea { width: 100%; min-height: 200px; background: var(--panel); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px; padding: 14px; font: 14px/1.5 inherit;
+    resize: vertical; }
+  textarea:focus { outline: 1px solid var(--lime-dim); border-color: var(--lime-dim); }
+  .row { display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  button { background: var(--lime); color: #15170a; border: 0; border-radius: 8px;
+    padding: 11px 22px; font: 600 14.5px inherit; cursor: pointer; }
+  button:hover { background: #d6ff5c; }
+  button:disabled { opacity: .45; cursor: default; }
+  .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  .ghost:hover { background: var(--panel2); color: var(--text); }
+  #status { color: var(--muted); font-size: 13px; }
+  #result { margin-top: 26px; display: none; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+  .band { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .band.high { color: var(--red); } .band.high .dot { background: var(--red); }
+  .band.uncertain { color: var(--amber); } .band.uncertain .dot { background: var(--amber); }
+  .band.low { color: var(--lime); } .band.low .dot { background: var(--lime); }
+  .band.abstain { color: var(--muted); } .band.abstain .dot { background: var(--muted); }
+  .detail { color: var(--muted); margin-top: 8px; font-size: 14px; }
+  .cue { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-top: 10px; background: var(--panel2); }
+  .cue .lab { font-weight: 600; }
+  .cue.sev-high .lab { color: var(--red); }
+  .cue.sev-medium .lab { color: var(--amber); }
+  .cue.sev-low .lab { color: var(--muted); }
+  .cue .adv { color: var(--muted); font-size: 13.5px; margin-top: 3px; }
+  .cue mark { background: rgba(255,92,92,.18); color: #ffb3b3; border-radius: 3px; padding: 0 3px; font-size: 13px; }
+  .cue.sev-medium mark { background: rgba(255,178,36,.16); color: #ffd38a; }
+  .cue.sev-low mark { background: rgba(255,255,255,.08); color: var(--text); }
+  ol.check { margin: 6px 0 0 20px; color: var(--muted); font-size: 14px; }
+  ol.check li { margin: 5px 0; }
+  h2 { font-size: 16px; margin-bottom: 4px; }
+  .method { color: var(--muted); font-size: 12.5px; margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px; }
+  #history { margin-top: 30px; }
+  .hitem { display: flex; justify-content: space-between; gap: 10px; padding: 9px 12px; border: 1px solid var(--line);
+    border-radius: 8px; margin-top: 8px; background: var(--panel); cursor: pointer; font-size: 13.5px; }
+  .hitem:hover { border-color: var(--lime-dim); }
+  .hitem .b { font-weight: 600; white-space: nowrap; }
+  .hitem .b.high { color: var(--red); } .hitem .b.uncertain { color: var(--amber); } .hitem .b.low { color: var(--lime); }
+  .hitem .snip { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  footer { margin-top: 40px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>Offer<span>Check</span></h1><span class="tag">job-listing risk screener</span></header>
+  <div class="tag">Paste a job or internship listing before you reply, apply, or share anything.</div>
+
+  <div class="notice"><b>What this is:</b> a screening tool that flags patterns seen in confirmed job scams.
+  <b>What it is not:</b> a verdict. A low-risk result is not proof a listing is safe, and it never will be.</div>
+
+  <textarea id="input" placeholder="Paste the full listing here - title, company profile, description, requirements, contact details..."></textarea>
+  <div class="row">
+    <button id="go">Screen this listing</button>
+    <button class="ghost" id="clear">Clear</button>
+    <span id="status"></span>
+  </div>
+
+  <div id="result">
+    <div class="card">
+      <div class="band" id="bandEl"><span class="dot"></span><span id="bandLabel"></span></div>
+      <div class="detail" id="bandDetail"></div>
+      <div class="method" id="method"></div>
+    </div>
+    <div class="card" id="cueCard" style="display:none">
+      <h2>Flagged patterns</h2>
+      <div id="cues"></div>
+    </div>
+    <div class="card">
+      <h2>Before you act - verify independently</h2>
+      <ol class="check" id="checklist"></ol>
+    </div>
+  </div>
+
+  <div id="history" style="display:none">
+    <h2>Recent screenings (stored only in this browser)</h2>
+    <div id="hlist"></div>
+  </div>
+
+  <footer>
+    Model: TF-IDF + logistic regression, isotonic-calibrated, trained on 17,880 labeled job ads
+    (EMSCAD dataset, 2012-2014 postings, CC0 public domain). Held-out test PR-AUC 0.90 / ROC-AUC 0.99.
+    Training data is a decade old - scam wording evolves, so misses are expected.
+    Your pasted text is used only to compute this screening. Nothing you paste is stored on any server.
+  </footer>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const HKEY = "offercheck_history_v1";
+
+function loadHist(){ try { return JSON.parse(localStorage.getItem(HKEY)) || []; } catch { return []; } }
+function saveHist(h){ localStorage.setItem(HKEY, JSON.stringify(h.slice(0,20))); }
+
+function renderHist(){
+  const h = loadHist();
+  $("history").style.display = h.length ? "block" : "none";
+  $("hlist").innerHTML = "";
+  h.forEach((it, i) => {
+    const d = document.createElement("div");
+    d.className = "hitem";
+    const bandName = it.verdict === "abstain" ? "abstain" : it.band;
+    const bandLabel = it.verdict === "abstain" ? "not screened" : it.label;
+    d.innerHTML = `<span class="snip"></span><span class="b ${bandName}"></span>`;
+    d.querySelector(".snip").textContent = it.snip;
+    d.querySelector(".b").textContent = bandLabel;
+    d.title = new Date(it.ts).toLocaleString();
+    d.onclick = () => { $("input").value = it.text; run(); };
+    $("hlist").appendChild(d);
+  });
+}
+
+function esc(s){ const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+async function run(){
+  const text = $("input").value.trim();
+  if (!text) return;
+  $("go").disabled = true; $("status").textContent = "Screening...";
+  try {
+    const r = await fetch("/api/screen", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text}) });
+    const data = await r.json();
+    render(data);
+    const h = loadHist();
+    h.unshift({ ts: Date.now(), text, snip: text.slice(0,90), verdict: data.verdict, band: data.band, label: data.label });
+    saveHist(h); renderHist();
+  } catch (e) {
+    $("status").textContent = "Something went wrong. Try again.";
+  } finally {
+    $("go").disabled = false; $("status").textContent = "";
+  }
+}
+
+function render(d){
+  $("result").style.display = "block";
+  const bandName = d.verdict === "abstain" ? "abstain" : d.band;
+  $("bandEl").className = "band " + bandName;
+  $("bandLabel").textContent = d.label;
+  $("bandDetail").textContent = d.detail;
+  $("method").textContent = d.method || "";
+  $("method").style.display = d.method ? "block" : "none";
+  const cc = $("cueCard"); const cues = d.cues || [];
+  cc.style.display = cues.length ? "block" : "none";
+  $("cues").innerHTML = cues.map(c =>
+    `<div class="cue sev-${c.severity}"><div class="lab">${esc(c.label)}</div>` +
+    (c.matches||[]).slice(0,3).map(m => `<mark>${esc(m.text)}</mark>`).join(" ") +
+    `<div class="adv">${esc(c.advice)}</div></div>`
+  ).join("");
+  $("checklist").innerHTML = (d.checklist||[]).map(x => `<li>${esc(x)}</li>`).join("");
+  $("result").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+$("go").onclick = run;
+$("clear").onclick = () => { $("input").value = ""; $("result").style.display = "none"; };
+renderHist();
+</script>
+</body>
+</html>

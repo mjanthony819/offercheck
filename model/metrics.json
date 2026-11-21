@@ -1,0 +1,94 @@
+{
+  "n_total": 17880,
+  "n_fraud": 866,
+  "prevalence": 0.0484,
+  "split": {
+    "train": 10728,
+    "calibration": 3576,
+    "test": 3576
+  },
+  "test": {
+    "pr_auc": 0.9012,
+    "roc_auc": 0.9866,
+    "brier": 0.0112,
+    "brier_baseline": 0.0484
+  },
+  "calibration_table_test": [
+    {
+      "pred_mean": 0.0,
+      "empirical_rate": 0.0007,
+      "n": 2790
+    },
+    {
+      "pred_mean": 0.0,
+      "empirical_rate": 0.0007,
+      "n": 2790
+    },
+    {
+      "pred_mean": 0.0,
+      "empirical_rate": 0.0007,
+      "n": 2790
+    },
+    {
+      "pred_mean": 0.0,
+      "empirical_rate": 0.0007,
+      "n": 2790
+    },
+    {
+      "pred_mean": 0.0,
+      "empirical_rate": 0.0007,
+      "n": 2790
+    },
+    {
+      "pred_mean": 0.0,
+      "empirical_rate": 0.0007,
+      "n": 2790
+    },
+    {
+      "pred_mean": 0.0,
+      "empirical_rate": 0.0007,
+      "n": 2790
+    },
+    {
+      "pred_mean": 0.0003,
+      "empirical_rate": 0.0016,
+      "n": 3124
+    },
+    {
+      "pred_mean": 0.0084,
+      "empirical_rate": 0.0112,
+      "n": 446
+    },
+    {
+      "pred_mean": 0.3841,
+      "empirical_rate": 0.3733,
+      "n": 450
+    }
+  ],
+  "operating_points_test": [
+    {
+      "threshold": 0.15,
+      "precision": 0.6639,
+      "recall": 0.9133,
+      "flag_rate": 0.0666
+    },
+    {
+      "threshold": 0.3,
+      "precision": 0.8961,
+      "recall": 0.7977,
+      "flag_rate": 0.0431
+    },
+    {
+      "threshold": 0.5,
+      "precision": 0.8961,
+      "recall": 0.7977,
+      "flag_rate": 0.0431
+    },
+    {
+      "threshold": 0.7,
+      "precision": 0.9478,
+      "recall": 0.7341,
+      "flag_rate": 0.0375
+    }
+  ]
+}
