@@ -20,7 +20,7 @@ phrases that match scam patterns and tells you what to verify before you act.
 
 1. **Calibrated ML screen.** TF-IDF (1-2 grams) + logistic regression trained on
    the EMSCAD dataset (17,880 real job ads, 866 labeled fraudulent, postings
-   from 2012-2014, CC0 public domain via the Kaggle mirror). Probabilities are
+   from 2012-2014; provenance below). Probabilities are
    isotonic-calibrated on a held-out calibration split. The app only shows
    risk bands derived from the calibrated probability - never raw scores.
 2. **Deterministic cue extractor.** Nine literal, inspectable pattern families
@@ -64,16 +64,31 @@ Open http://localhost:8000
 - `app/main.py` - FastAPI backend (`/api/screen`)
 - `app/cues.py` - deterministic red-flag cue extractor
 - `app/static/index.html` - single-page UI (charcoal/lime)
-- `data/fake_job_postings.csv` - EMSCAD (source + license below)
+- `data/fake_job_postings.csv` - EMSCAD (provenance below)
 
-## Data source and license
+## Data source and provenance
 
-EMSCAD (Employment Scam Aegean Dataset), published by the University of the
-Aegean for research use; acquired via the Kaggle mirror
-"kaggle.com/datasets/amruthjithrajvr/recruitment-scam", designated **CC0:
-Public Domain**. Paper: Vidros et al., "Automatic Detection of Online
-Recruitment Frauds: Characteristics, Methods, and a Public Dataset",
-Future Internet 2017, 9(4), 59 (MDPI).
+The model is trained on EMSCAD (Employment Scam Aegean Dataset): 17,880 real
+job ads posted on Workable between 2012 and 2014, 866 labeled fraudulent.
+EMSCAD was released by University of the Aegean researchers alongside Vidros
+et al., "Automatic Detection of Online Recruitment Frauds: Characteristics,
+Methods, and a Public Dataset", Future Internet 2017, 9(1), 6 (MDPI, open
+access), which describes it as a publicly available dataset.
+
+Provenance of the copy used here: a public GitHub mirror
+(hoangsonww/Spot-the-Scam-AI-Job-Fraud) of the widely used Kaggle mirror
+"Recruitment Scam" (kaggle.com/datasets/amruthjithrajvr/recruitment-scam),
+whose page designates the dataset "CC0: Public Domain" (checked Nov 2026).
+The authors' original download page (emscad.samos.aegean.gr) is no longer
+reachable, so we cannot independently confirm the original distribution
+terms; we rely on the mirror's designation and the paper's description of
+the dataset as public.
+
+The raw ads are not republished in this repository: the CSV is git-ignored
+and `train.py` downloads it from the mirror above at training time. The demo
+and screenshots use only synthetic listings. The trained artifact
+(`model/model.joblib`) embeds a TF-IDF vocabulary derived from the ads -
+individual tokens and bigrams, not the ads themselves.
 
 ## Development disclosure
 
@@ -85,4 +100,4 @@ for the honesty constraints above. No pre-existing project code was reused.
 
 ## License
 
-MIT (code). Dataset as above (CC0).
+MIT (code). Dataset: see provenance above.
