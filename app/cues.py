@@ -113,7 +113,7 @@ CUES = [
 
 NEGATION_RE = re.compile(
     r"(never|no|not|don't|do not|doesn't|does not|without|free of|won't|will not|"
-    r"none|zero|refuse|decline|avoid)\W{0,20}$",
+    r"none|zero|refuse|decline|avoid)\b[^.!?\n]{0,30}$",
     re.IGNORECASE,
 )
 
