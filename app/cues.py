@@ -111,6 +111,18 @@ CUES = [
     },
 ]
 
+NEGATION_RE = re.compile(
+    r"(never|no|not|don't|do not|doesn't|does not|without|free of|won't|will not|"
+    r"none|zero|refuse|decline|avoid)\W{0,20}$",
+    re.IGNORECASE,
+)
+
+
+def _negated(tl, start):
+    """True when the ~50 chars before the match negate it (e.g. 'we never ask for')."""
+    return bool(NEGATION_RE.search(tl[max(0, start - 50):start].strip()))
+
+
 def extract_cues(text):
     tl = text.lower()
     out = []
@@ -118,6 +130,8 @@ def extract_cues(text):
         hits = []
         for pat in cue["patterns"]:
             for m in re.finditer(pat, tl, flags=re.IGNORECASE | re.DOTALL):
+                if _negated(tl, m.start()):
+                    continue  # anti-scam reassurance, not a scam signal
                 hits.append({"start": m.start(), "end": m.end(), "text": text[m.start():m.end()]})
         if hits:
             out.append({k: cue[k] for k in ("id", "label", "severity", "advice")} | {"matches": hits[:5]})
